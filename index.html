@@ -1,0 +1,339 @@
+<!doctype html>  
+<html lang="en">
+	
+	<head>
+		<meta charset="utf-8">
+		
+		<title>On WebWorkers</title>
+
+		<meta name="description" content="An easy to use CSS 3D slideshow tool for quickly creating good looking HTML presentations.">
+		<meta name="author" content="Hakim El Hattab">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+		
+		<link href='http://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+		
+		<link rel="stylesheet" href="css/reset.css">
+		<link rel="stylesheet" href="css/main.css">
+		<link rel="stylesheet" href="css/print.css" type="text/css" media="print">
+
+		<link rel="stylesheet" href="lib/css/github.css">
+		<style type="text/css">
+			code {
+				border-radius: 5px;
+			}
+
+		</style>
+	</head>
+	
+	<body>
+		
+		<div class="reveal">
+
+			<!-- Used to fade in a background when a specific slide state is reached -->
+			<div class="state-background"></div>
+			
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+				<section>
+					<br />
+					<h3>A guided tour on</h3>
+					<h1>Web Workers</h1>
+					<br/>
+					<h3>by <span style="text-shadow: 0 0 5px lightblue; font-size: 1.5em">@igorsoarez</span></h3>
+					<h3></h3>
+					<br />
+					<br />
+					<img src="img/r42.png" style="height: 40px"></img>
+				</section>
+				<section>
+					<section>
+						<br />
+						<br />
+						<h2>So what are Web Workers?</h2>
+					</section>
+					<section>
+						<div class="fragment" style="display: inline">
+							<img src="img/worker1.jpeg" alt="" style="height: 200px;">
+							<img src="img/worker2.jpeg" alt="" style="height: 200px;">
+						</div>
+						<img class="fragment" src="img/cleaning.jpeg" alt="" style="height: 200px;">
+						<div class="fragment">
+							<img src="img/spiderman.jpeg" alt="" style="height: 200px;">
+							<img src="img/trollface.png" alt="" style="height: 200px;">
+						</div>
+					</section>
+				</section>
+				<section>
+					<h1>API</h1>
+					<h3>Defined by</h3>
+					<ul>
+						<li>World-Wide Web Consortium (W3C)</li>
+						<li>Web Hypertext Application Technology Working Group (WHATWG)</li>
+					</ul>
+					<br />
+				</section>
+				<section style="font-size: 60px;">
+					<br/>
+					<blockquote>Used to perform a computationally expensive task without interrupting the user interface</blockquote>
+				</section>
+
+				<section style="text-align: center">
+					<br />
+					<div style="background-color: white; padding: 10px; border-radius: 10px; width: 700px; display: block; margin: auto">
+					<img src="img/chrome.jpeg" alt="" style="height: 140px;">
+					<img src="img/firefox.png" alt="" style="height: 140px;">
+					<img src="img/safari.png" alt="" style="height: 140px;">
+					<img src="img/opera.png" alt="" style="height: 140px;">
+					</div>
+					<br/>
+					<div class="fragment">
+							<img src="img/ie.jpeg" alt="" style="height: 140px; vertical-align: text-bottom">
+					</div>
+				</section>
+				<section>
+					<br />
+					<h1>How?</h1>
+					<br />
+					
+					<pre><code contenteditable class="html">&lt;script&gt;
+  var worker = new Worker('worker.js');
+&lt;/script&gt;</code></pre>
+<p class="fragment">Browser ignores MIME type</p>
+				</section>
+
+				<section>
+					<br />
+					<h2>Workers play by special rules</h2>
+					<ul>
+						<li>Separate parallel execution environment</li>
+						<li>Distinct event loop</li>
+						<li class="fragment">No access to <span style="text-decoration: line-through; color: red"><span style="color: white">DOM</span></span></li>
+						<li class="fragment">No access to <span style="text-decoration: line-through; color: red"><span style="color: white">UI Events</span></span></li>
+						<li class="fragment">No <span style="text-decoration: line-through; color: red"><span style="color: white"><code>window</code>, <code>document</code>, <code>parent</code>, <code>console</code>, <code>alert</code></span></span></li>
+						<li class="fragment">No <span style="text-decoration: line-through; color: red"><span style="color: white">shared state</span></span></li>
+						
+					</ul>
+				</section>
+				<section>
+					<br />
+					<h2>No shared state ?!?!?!</h2>
+					<pre><code contenteditable class="html">&lt;script&gt;
+  var worker = new Worker('worker.js');
+  worker.onmessage = function (event) {
+    console.dir(event.data);
+    worker.postMessage({ letter: 'R', number: 42 })
+  };
+&lt;/script&gt;</code></pre>
+<div>worker.js</div>
+<pre><code contenteditable class="javascript">self.postMessage({ name: 'Rulio' });
+self.onmessage = function (event) {
+  // do something with event.data;
+};</code></pre>
+<p>No sharing - messages are copied</p>
+				</section>
+				<section>
+					<br />
+					<p style="font-size: 50px;">What CAN they do?</p>
+					<ul>
+						<li class="fragment">Use the <code>navigator</code> object</li>
+						<li class="fragment">Use the <code>location</code> object (read-only)</li>
+						<li class="fragment"><code>XMLHttpRequest</code></li>
+						<li class="fragment"><code>setTimeout</code>/<code>setInterval</code>/...</li>
+						<li class="fragment">The Application Cache</li>
+						<li class="fragment"><code>importScripts()</code></li>
+						<li class="fragment">create subworkers - <code>new Worker('subworker.js')</code></li>
+					</ul>
+				</section>
+				<section>
+					<br />
+					<h2>Handling errors</h2>
+<br />
+<pre><code contenteditable class="javascript">worker.onerror = function(e) {
+	throw new Error(event.message 
+		+ " (" + event.filename + ":" 
+		+ event.lineno + ")");
+};</code></pre>					
+				</section>
+				<section>
+					<br />
+					<h2>Stoping a worker</h2>
+					<br />
+					<p>From the origin:</p>
+<pre><code contenteditable class="javascript">worker.terminate()</code></pre>					
+<br />
+<p>From the worker:</p>
+<pre><code contenteditable class="javascript">self.close()</code></pre>
+				</section>
+				<section>
+					<h1>Why?</h1>
+					<ul style="font-size: 50px; line-height: 60px;">
+						<li class="fragment">Computationally expensive tasks
+							<ul style="font-size: 30px; line-height: 40px;">
+<li>Spell checking</li>
+<li>Audio/Video analysis</li>
+<li>Processing large responses</li>
+<li>Prefetching data</li>
+							</ul>
+						</li>
+						<li class="fragment">Background I/O
+							<ul style="font-size: 30px; line-height: 40px;">
+								<li>Polling webservices</li>
+							</ul>
+						</li>
+						<li class="fragment">Coordinating multiple tabs
+							<ul class="fragment" style="font-size: 30px; line-height: 40px;"><li>with Shared Workers</li></ul>
+						</li>
+					</ul>
+				</section>
+				<section>
+					<section>
+						<h2>Shared workers</h2>
+						<ul>
+							<li>are named</li>
+							<li>any script running in the same origin can communicate by the URL or name</li>
+							<li>use <code>port</code> (<code>MessagePort</code> objects) to communicate</li>
+							<li>require <code>worker.port.start()</code> </li>
+							<li>have <code>onconnect</code></li>
+
+						</ul>
+					</section>
+					<section>
+						<h2>Example</h2>
+<pre><code contenteditable class="html">&lt;script&gt;
+  var worker = new SharedWorker('sharedworker.js', 'name');
+  worker.port.onmessage = function(e) { //not worker.onmessage!
+    console.dir(e.data);
+  };
+&lt;/script&gt;</code></pre>
+
+<p>sharedworker.js</p>
+<pre><code contenteditable class="javascript">onconnect = function(e) {
+  var port = e.ports[0];
+  port.postMessage('Hello World!');
+};</code></pre>
+<p>need to use <code>onconnect</code></p>
+
+					</section>
+				</section>
+				<section>
+					<section>
+						<br />
+						<h2>Web Workers are heavyweight</h2>
+						<br />
+						<div style="font-size: 45px;">
+							<p>Expected to be:</p>
+							<ul style="line-height: 60px">
+								<li>Long lived</li>
+								<li>High start-up performance cost</li>
+								<li>High per-instance memory cost</li>
+							</ul>
+						</div>
+					</section>
+					<section>
+						<br />
+						<img src="img/worker1.jpeg" alt="" style="height: 200px; display: block; margin: auto" class="fragment">
+						<img src="img/worker2.jpeg" alt="" style="height: 200px;"  class="fragment">
+					</section>
+					<section>
+						<br />
+						<div style="">
+							<img src="img/worker1.jpeg" alt="" style="height: 200px;">
+							<img src="img/worker2.jpeg" alt="" style="height: 200px;">
+							<img src="img/worker1.jpeg" alt="" style="height: 200px;">
+							<img src="img/worker2.jpeg" alt="" style="height: 200px;">
+							<img src="img/worker1.jpeg" alt="" style="height: 200px;">
+							<img src="img/worker2.jpeg" alt="" style="height: 200px;">
+							<img src="img/worker1.jpeg" alt="" style="height: 200px;">
+							<img src="img/worker2.jpeg" alt="" style="height: 200px;">
+							<img src="img/worker1.jpeg" alt="" style="height: 200px;">
+							<img src="img/worker2.jpeg" alt="" style="height: 200px;">
+							<img src="img/worker1.jpeg" alt="" style="height: 200px;">
+							<img src="img/worker2.jpeg" alt="" style="height: 200px;">
+						</div>
+						<div style="position: absolute; color: red; top: 240px; font-size: 500px; letter-spacing: 50px; text-align: center; width: 1000px;">
+							X
+						</div>
+					</section>
+				</section>
+				<section>
+					<br />
+					<h1>Thank you!</h1>
+					<img class="fragment" src="img/trollface.png" alt="" style="height: 200px;">
+				</section>
+			</div>
+
+			<!-- The navigational controls UI -->
+			<aside class="controls">
+				<a class="left" href="#">&#x25C4;</a>
+				<a class="right" href="#">&#x25BA;</a>
+				<a class="up" href="#">&#x25B2;</a>
+				<a class="down" href="#">&#x25BC;</a>
+			</aside>
+
+			<!-- Presentation progress bar -->
+			<div class="progress"><span></span></div>
+			
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+
+		<script>
+			// Scripts that should be loaded before initializing
+			var scripts = [];
+
+			// If the browser doesn't support classList, load a polyfill
+			if( !document.body.classList ) {
+				scripts.push( 'lib/js/classList.js' );
+			}
+
+			// Load markdown parser if there are slides defined using markdown
+			if( document.querySelector( '[data-markdown]' ) ) {
+				scripts.push( 'lib/js/showdown.js' );
+				scripts.push( 'lib/js/data-markdown.js' );
+			}
+
+			// If we're runnning the notes server we need to include some additional JS
+			// TODO Is there a better way to determine if we're running the notes server?
+			if( window.location.host === 'localhost:1947' ) {
+				scripts.push( 'socket.io/socket.io.js' );
+				scripts.push( 'plugin/speakernotes/client.js' );
+			}
+
+			scripts.push( 'js/reveal.js' );
+
+			// Load the scripts and, when completed, initialize reveal.js
+			head.js.apply( null, scripts.concat([function() {
+
+				// Fires when a slide with data-state=customevent is activated
+				Reveal.addEventListener( 'customevent', function() {
+					console.log( '"customevent" has fired' );
+				} );
+
+				// Fires each time a new slide is activated
+				Reveal.addEventListener( 'slidechanged', function( event ) {
+					// event.previousSlide, event.currentSlide, event.indexh, event.indexv
+				} );
+
+				// Full list of configuration options available here:
+				// https://github.com/hakimel/reveal.js#configuration
+				Reveal.initialize({
+					controls: true,
+					progress: true,
+					history: true,
+					
+					theme: Reveal.getQueryHash().theme || 'default', // default/neon/beige
+					transition: Reveal.getQueryHash().transition || 'default' // default/cube/page/concave/linear(2d)
+				});
+
+			}]));
+			
+			// Load highlight.js for syntax highlighting of code samples
+			head.js( 'lib/js/highlight.js', function() { 
+				hljs.initHighlightingOnLoad(); 
+			} );
+		</script>
+
+	</body>
+</html>

@@ -1,0 +1,107 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Demo</title>
+
+    <script type="text/javascript">
+      
+      document.addEventListener( "DOMContentLoaded", DOMContentLoaded, false );
+
+      var canvas, c;
+      var particles = [];
+
+
+      function DOMContentLoaded() {
+        canvas = document.createElement('canvas');
+        document.body.appendChild(canvas);
+        canvas.width = window.innerWidth / 2;
+        canvas.height = window.innerHeight / 2;
+
+        c = canvas.getContext('2d');
+
+        for (i=0; i<400; ++i) {
+          particles.push(new Particle());  
+        }
+
+        setInterval(draw, 1000/20);
+      }
+
+      var letters = ['A', 'B', 'C', 'D', 'E', 'F'];
+      for(var i=9; i>=0; --i)
+        letters.unshift(i + '');
+
+      function getRandomColor() {
+        var color = '#';
+        color += letters[Math.floor(Math.random() * letters.length)];
+        color += letters[Math.floor(Math.random() * letters.length)];
+        color += letters[Math.floor(Math.random() * letters.length)];
+        return color;
+      }
+
+      function draw() {
+          var i;          
+
+          c.clearRect(0, 0, canvas.width, canvas.height);
+
+          for (i = 0; i<particles.length; ++i)
+            particles[i].update();
+        }
+
+        function Particle() {
+          this.x = canvas.width/2;
+          this.y = canvas.height/4;
+          var minSize = canvas.height / 300;
+          var maxSize = canvas.height / 80;
+          this.size = Math.random() * (maxSize - minSize) + minSize;
+          this.color = getRandomColor();
+
+          var maxSpeed = 10;
+          var minSpeed = 1;
+          this.velX = ((Math.random() * (maxSpeed - minSpeed) + minSpeed)* 2) - maxSpeed;
+          this.velY = ((Math.random() * (maxSpeed - minSpeed) + minSpeed)* 2) - maxSpeed;
+
+          this.update = function() {
+            with(this) {
+              x +=velX;
+              y +=velY;
+
+              if (x < 0 || x > canvas.width) 
+                x = canvas.width/2;
+
+              if (y < 0 || y > canvas.height) 
+                y = canvas.height/2;
+            }
+
+            c.fillStyle = this.color;
+            c.beginPath();
+            c.arc(this.x, this.y, this.size, 0, Math.PI*2, true);
+            c.fill();
+            // c.fillRect(this.x, this.y, 20, 20);
+          }
+        }
+
+        function buttonClick() {
+          var a = Math.random() * 2000;
+          for (var i=0; i<200000000; ++i) 
+            a = a / a * a ;
+          var el =  document.getElementById('result');
+          el.innerText = a;
+        }
+
+    </script>
+    <style type="text/css">
+      canvas {
+        border: 3px solid black;
+        border-radius: 20px;
+        display: inline-block;
+      }
+    </style>
+  </head>
+  <body>
+    <h3>No web worker</h3>
+    <div>
+      <button onclick="buttonClick()">Calculate</button>
+      <span id="result"></span>
+    </div>
+  </body>
+</html>

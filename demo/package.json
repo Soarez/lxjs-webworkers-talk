@@ -1,0 +1,17 @@
+{
+  "author": "Soarez <igorsoarez@gmail.com>",
+  "name": "szdemo",
+  "version": "0.1.0",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/R42/lxjs-workshop-slideshow.git"
+  },
+  "dependencies": {
+    "node-static": "~0.6.2"
+  },
+  "devDependencies": {},
+  "optionalDependencies": {},
+  "engines": {
+    "node": "*"
+  }
+}
